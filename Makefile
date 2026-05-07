@@ -2,7 +2,9 @@ IVERILOG = iverilog
 VVP      = vvp
 FLAGS    = -g2012
 
-.PHONY: test_alu test_adder clean
+.PHONY: all test_alu test_adder test_sign_ext test_mux2 clean
+
+all: test_alu test_adder test_sign_ext test_mux2
 
 test_alu: alu.vvp
 	$(VVP) alu.vvp
@@ -15,6 +17,18 @@ test_adder: adder.vvp
 
 adder.vvp: src/adder.sv tb/tb_adder.sv
 	$(IVERILOG) $(FLAGS) -o adder.vvp tb/tb_adder.sv src/adder.sv
+
+test_sign_ext: sign_ext.vvp
+	$(VVP) sign_ext.vvp
+
+sign_ext.vvp: src/sign_ext.sv tb/tb_sign_ext.sv
+	$(IVERILOG) $(FLAGS) -o sign_ext.vvp tb/tb_sign_ext.sv src/sign_ext.sv
+
+test_mux2: mux2.vvp
+	$(VVP) mux2.vvp
+
+mux2.vvp: src/mux2.sv tb/tb_mux2.sv
+	$(IVERILOG) $(FLAGS) -o mux2.vvp tb/tb_mux2.sv src/mux2.sv
 
 clean:
 	rm -f *.vvp *.vcd
