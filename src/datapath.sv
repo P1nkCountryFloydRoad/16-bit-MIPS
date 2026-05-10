@@ -14,7 +14,8 @@ module datapath (
     input  logic        JumpReg,
     input  logic [2:0]  ALUControl,
     output logic [15:0] instruction,
-    output logic        zero
+    output logic        zero,
+    output logic [11:0] pc_out
 );
 
     // state
@@ -23,7 +24,6 @@ module datapath (
     logic [7:0]  dmem_array [0:255]; 
 
     // PC
-    logic [11:0] pc_out;
     logic [11:0] pc_next;
     logic [11:0] pc_plus_1;
     logic [11:0] pc_branch;
@@ -131,5 +131,13 @@ module datapath (
         .d0(pc_j_out), .d1(rd1_ext),
         .s(JumpReg), .y(pc_next)
     );
+
+    // Zero-initialize all memories so unloaded entries are safe
+    integer _i;
+    initial begin
+        for (_i = 0; _i < 8;   _i = _i + 1) rf[_i]          = 8'd0;
+        for (_i = 0; _i < 256; _i = _i + 1) dmem_array[_i]  = 8'd0;
+        for (_i = 0; _i < 16;  _i = _i + 1) imem_array[_i]  = 16'd0;
+    end
 
 endmodule

@@ -2,9 +2,9 @@ IVERILOG = iverilog
 VVP      = vvp
 FLAGS    = -g2012
 
-.PHONY: all test_alu test_adder test_sign_ext test_mux2 test_datapath clean
+.PHONY: all test_alu test_adder test_sign_ext test_mux2 test_datapath test_cpu clean
 
-all: test_alu test_adder test_sign_ext test_mux2 test_datapath
+all: test_alu test_adder test_sign_ext test_mux2 test_datapath test_cpu
 
 test_alu: alu.vvp
 	$(VVP) alu.vvp
@@ -38,6 +38,15 @@ test_datapath: datapath.vvp
 
 datapath.vvp: $(DATAPATH_SRCS) tb/tb_datapath.sv
 	$(IVERILOG) $(FLAGS) -o datapath.vvp tb/tb_datapath.sv $(DATAPATH_SRCS)
+
+CPU_SRCS = src/cpu.sv src/controller.sv src/maindec.sv src/aludec.sv \
+           $(DATAPATH_SRCS)
+
+test_cpu: cpu.vvp
+	$(VVP) cpu.vvp
+
+cpu.vvp: $(CPU_SRCS) tb/tb_cpu.sv
+	$(IVERILOG) $(FLAGS) -o cpu.vvp tb/tb_cpu.sv $(CPU_SRCS)
 
 clean:
 	rm -f *.vvp *.vcd
