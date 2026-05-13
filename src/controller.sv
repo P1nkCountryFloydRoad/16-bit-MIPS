@@ -2,13 +2,14 @@ module controller (
     input  logic [15:0] instruction,
     output logic        RegDst,
     output logic        ALUSrc,
-    output logic        MemtoReg,
+    output logic [1:0]  MemtoReg,
     output logic        RegWrite,
     output logic        MemRead,
     output logic        MemWrite,
     output logic        Branch,
     output logic        Jump,
     output logic        JumpReg,
+    output logic        Link,
     output logic [2:0]  ALUControl
 );
 
@@ -22,7 +23,7 @@ module controller (
         .RegDst(RegDst), .ALUSrc(ALUSrc), .MemtoReg(MemtoReg),
         .RegWrite(RegWrite), .MemRead(MemRead), .MemWrite(MemWrite),
         .Branch(Branch), .Jump(Jump), .JumpReg(JumpReg),
-        .ALUOp(ALUOp)
+        .Link(Link), .ALUOp(ALUOp)
     );
 
     aludec ad (

@@ -6,8 +6,9 @@ module cpu (
 );
 
     // Control
-    logic RegDst, ALUSrc, MemtoReg, RegWrite, MemRead;
-    logic MemWrite, Branch, Jump, JumpReg;
+    logic RegDst, ALUSrc, RegWrite, MemRead;
+    logic MemWrite, Branch, Jump, JumpReg, Link;
+    logic [1:0] MemtoReg;
     logic [2:0] ALUControl;
 
     // Status 
@@ -18,7 +19,7 @@ module cpu (
         .RegDst(RegDst), .ALUSrc(ALUSrc), .MemtoReg(MemtoReg),
         .RegWrite(RegWrite), .MemRead(MemRead), .MemWrite(MemWrite),
         .Branch(Branch), .Jump(Jump), .JumpReg(JumpReg),
-        .ALUControl(ALUControl)
+        .Link(Link), .ALUControl(ALUControl)
     );
 
     datapath dp (
@@ -26,7 +27,7 @@ module cpu (
         .RegDst(RegDst), .ALUSrc(ALUSrc), .MemtoReg(MemtoReg),
         .RegWrite(RegWrite), .MemWrite(MemWrite),
         .Branch(Branch), .Jump(Jump), .JumpReg(JumpReg),
-        .ALUControl(ALUControl),
+        .Link(Link), .ALUControl(ALUControl),
         .instruction(instr_debug),
         .zero(zero),
         .pc_out(pc_debug)

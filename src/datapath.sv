@@ -6,12 +6,13 @@ module datapath (
     input  logic        reset,
     input  logic        RegDst,
     input  logic        ALUSrc,
-    input  logic        MemtoReg,
+    input  logic [1:0]  MemtoReg,
     input  logic        RegWrite,
     input  logic        MemWrite,
     input  logic        Branch,
     input  logic        Jump,
     input  logic        JumpReg,
+    input  logic        Link,
     input  logic [2:0]  ALUControl,
     output logic [15:0] instruction,
     output logic        zero,
@@ -58,10 +59,14 @@ module datapath (
     );
 
     // RegDst mux: write address = rt (RegDst=0) or rd (RegDst=1)
+    logic [2:0] a3_regdst;
     mux2 #(.WIDTH(3)) mux_regdst (
         .d0(instruction[8:6]), .d1(instruction[5:3]),
-        .s(RegDst), .y(a3)
+        .s(RegDst), .y(a3_regdst)
     );
+
+    // JAL always writes to $7 ($ra)
+    assign a3 = Link ? 3'b111 : a3_regdst;
 
     // Sign extension
     logic [7:0]  sign_ext_imm;
@@ -74,6 +79,10 @@ module datapath (
     sign_ext_12 se_12 (
         .a(instruction[5:0]), .y(sign_ext_imm_12)
     );
+
+    //  JAL return address
+    logic [7:0] pc_plus_1_lo;
+    assign pc_plus_1_lo = pc_plus_1[7:0];
 
     // ALU
     logic [7:0] alu_b, alu_result;
@@ -102,11 +111,17 @@ module datapath (
     );
 
     
-    // MemtoReg mux: write data = ALU result (MemtoReg=0) or memory (MemtoReg=1)
-    mux2 #(.WIDTH(8)) mux_memtoreg (
-        .d0(alu_result), .d1(mem_read_data),
-        .s(MemtoReg), .y(wd3)
-    );
+    // wd3 source:
+    //   2'b00 = ALU result   (R-type, addi, sw)
+    //   2'b01 = memory       (lw)
+    //   2'b10 = pc_plus_1[7:0]  (JAL: save return address)
+    always_comb begin
+        case (MemtoReg)
+            2'b01:   wd3 = mem_read_data;
+            2'b10:   wd3 = pc_plus_1_lo;
+            default: wd3 = alu_result;
+        endcase
+    end
 
     // PC next selection
     assign branch_taken = Branch & zero;
