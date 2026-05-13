@@ -31,7 +31,8 @@ mux2.vvp: src/mux2.sv tb/tb_mux2.sv
 	$(IVERILOG) $(FLAGS) -o mux2.vvp tb/tb_mux2.sv src/mux2.sv
 
 DATAPATH_SRCS = src/datapath.sv src/pc.sv src/alu.sv src/adder.sv \
-                src/sign_ext.sv src/sign_ext_12.sv src/mux2.sv
+                src/sign_ext.sv src/sign_ext_12.sv src/mux2.sv \
+                src/imem.sv src/dmem.sv src/regfile.sv
 
 test_datapath: datapath.vvp
 	$(VVP) datapath.vvp
