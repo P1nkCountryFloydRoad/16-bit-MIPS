@@ -19,10 +19,7 @@ module datapath (
 );
 
     // state
-    logic [15:0] imem_array [0:15];  
-    logic [7:0]  rf         [0:7];   
-    logic [7:0]  dmem_array [0:255]; 
-
+   
     // PC
     logic [11:0] pc_next;
     logic [11:0] pc_plus_1;
@@ -40,16 +37,25 @@ module datapath (
     );
 
     // IMEM
-    assign instruction = imem_array[pc_out[3:0]];
+    imem imem0 (
+        .a(pc_out),
+        .rd(instruction)
+    );
 
     //  Register file 
-    logic [2:0] a1, a2, a3;
+    logic [2:0] a3;
     logic [7:0] rd1, rd2, wd3;
 
-    assign a1  = instruction[11:9];
-    assign a2  = instruction[8:6];
-    assign rd1 = rf[a1];
-    assign rd2 = rf[a2];
+    regfile rf0 (
+        .clk(clk),
+        .RegWrite(RegWrite),
+        .ra1(instruction[11:9]),
+        .ra2(instruction[8:6]),
+        .wa(a3),
+        .wd(wd3),
+        .rd1(rd1),
+        .rd2(rd2)
+    );
 
     // RegDst mux: write address = rt (RegDst=0) or rd (RegDst=1)
     mux2 #(.WIDTH(3)) mux_regdst (
@@ -87,12 +93,13 @@ module datapath (
     // Data memory
     logic [7:0] mem_read_data;
 
-    assign mem_read_data = dmem_array[alu_result];
-
-    always_ff @(posedge clk) begin
-        if (MemWrite)
-            dmem_array[alu_result] <= rd2;
-    end
+    dmem dmem0 (
+        .clk(clk),
+        .we(MemWrite),
+        .a(alu_result),
+        .wd(rd2),
+        .rd(mem_read_data)
+    );
 
     
     // MemtoReg mux: write data = ALU result (MemtoReg=0) or memory (MemtoReg=1)
@@ -100,12 +107,6 @@ module datapath (
         .d0(alu_result), .d1(mem_read_data),
         .s(MemtoReg), .y(wd3)
     );
-
-    // Register file write port
-    always_ff @(posedge clk) begin
-        if (RegWrite && a3 != 3'b000)
-            rf[a3] <= wd3;
-    end
 
     // PC next selection
     assign branch_taken = Branch & zero;
@@ -132,12 +133,5 @@ module datapath (
         .s(JumpReg), .y(pc_next)
     );
 
-    // Zero-initialize all memories so unloaded entries are safe
-    integer _i;
-    initial begin
-        for (_i = 0; _i < 8;   _i = _i + 1) rf[_i]          = 8'd0;
-        for (_i = 0; _i < 256; _i = _i + 1) dmem_array[_i]  = 8'd0;
-        for (_i = 0; _i < 16;  _i = _i + 1) imem_array[_i]  = 16'd0;
-    end
 
 endmodule
