@@ -1,10 +1,13 @@
 IVERILOG = iverilog
 VVP      = vvp
-FLAGS    = -g2012
+FLAGS    = -g2012 -I src/
 
-.PHONY: all test_alu test_adder test_sign_ext test_mux2 test_datapath test_cpu clean
+.PHONY: all assemble test_alu test_adder test_sign_ext test_mux2 test_datapath test_cpu clean
 
 all: test_alu test_adder test_sign_ext test_mux2 test_datapath test_cpu
+
+assemble:
+	python3 assembler.py
 
 test_alu: alu.vvp
 	$(VVP) alu.vvp

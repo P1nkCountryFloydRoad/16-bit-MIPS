@@ -11,7 +11,8 @@ OPCODES = {
 R_TYPE = ['add', 'sub', 'and', 'or', 'slt']
 I_TYPE = ['addi', 'beq']
 MEM_TYPE = ['lw', 'sw'] # Special I-Type formatting
-J_TYPE = ['j', 'jal']
+J_TYPE = ['j', 'jal', ]
+JR = ['jr'] 
 
 def reg_to_bin(reg_str):
     """Converts '$1' to '001'"""
@@ -90,15 +91,18 @@ def assemble(input_file, output_file):
             addr_bin = imm_to_bin(addr, 12)
             binary = f"{opcode}{addr_bin}"
             
-        elif inst == 'jr':
+        elif inst in JR:
             rs = reg_to_bin(parts[1])
-            binary = f"{opcode}{rs}000000000" 
+            binary = f"{opcode}{rs}000000000"
 
         machine_code.append(binary)
         address += 1
+    NOP = '0001000000000000'  # add $0,$0,$0
     with open(output_file, 'w') as f:
         for code in machine_code:
             f.write(code + '\n')
-    print(f"Successfully assembled {len(machine_code)} to {output_file}")
+        for _ in range(4096 - len(machine_code)):
+            f.write(NOP + '\n')
+    print(f"Successfully assembled {len(machine_code)} instructions to {output_file}")
 
 assemble("assembly.txt", "memfile.dat")
