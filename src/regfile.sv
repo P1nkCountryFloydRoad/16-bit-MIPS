@@ -12,7 +12,7 @@ module regfile (
     logic [7:0] rf [7:0];
 
     always_ff @(posedge clk) begin
-        if (RegWrite) begin
+        if (RegWrite && wa != 3'b000) begin
             rf[wa] <= wd;
         end
     end
