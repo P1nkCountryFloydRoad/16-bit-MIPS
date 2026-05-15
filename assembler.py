@@ -97,7 +97,7 @@ def assemble(input_file, output_file):
 
         machine_code.append(binary)
         address += 1
-    NOP = '0001000000000000'  # add $0,$0,$0
+    NOP = '0001000000000000'  
     with open(output_file, 'w') as f:
         for code in machine_code:
             f.write(code + '\n')
@@ -105,4 +105,19 @@ def assemble(input_file, output_file):
             f.write(NOP + '\n')
     print(f"Successfully assembled {len(machine_code)} instructions to {output_file}")
 
-assemble("assembly.txt", "memfile.dat")
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) >= 3:
+        input_file = sys.argv[1]
+        output_file = sys.argv[2]
+        
+    elif len(sys.argv) == 2:
+        input_file = sys.argv[1]
+        output_file = "memfile.dat"
+        
+    else:
+        print("Usage: python3 assembler.py <input_file> [output_file]")
+        sys.exit(1)
+
+    assemble(input_file, output_file)
