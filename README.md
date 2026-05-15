@@ -23,8 +23,7 @@ This is a single-cycle RISC processor inspired by MIPS, scaled to a 16-bit instr
 
 ## 4. Instructions to Successfully Demo
 
-A video demo is provided below:
-![Video Demo](docs/Video_Demo.mp4)
+A video demo is provided [here](https://youtu.be/wpnADr3U8i4).
 
 ```
 make assemble_prog3
