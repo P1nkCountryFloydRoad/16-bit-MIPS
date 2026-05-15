@@ -2,12 +2,24 @@ IVERILOG = iverilog
 VVP      = vvp
 FLAGS    = -g2012 -I src/
 
-.PHONY: all assemble test_alu test_adder test_sign_ext test_mux2 test_datapath test_cpu clean
+.PHONY: all assemble test_alu test_adder test_sign_ext test_mux2 test_datapath test_cpu run clean
 
 all: test_alu test_adder test_sign_ext test_mux2 test_datapath test_cpu
 
 assemble:
-	python3 assembler.py
+	python3 assembler.py assembly.txt memfile.dat
+
+assemble_prog0:
+	python3 assembler.py programs/prog0_simple.asm memfile.dat
+
+assemble_prog1:
+	python3 assembler.py programs/prog1_leaf.asm memfile.dat
+
+assemble_prog2:
+	python3 assembler.py programs/prog2_nested.asm memfile.dat
+
+assemble_prog3:
+	python3 assembler.py programs/prog3_recursive.asm memfile.dat
 
 test_alu: alu.vvp
 	$(VVP) alu.vvp
@@ -51,6 +63,13 @@ test_cpu: cpu.vvp
 
 cpu.vvp: $(CPU_SRCS) tb/tb_cpu.sv
 	$(IVERILOG) $(FLAGS) -o cpu.vvp tb/tb_cpu.sv $(CPU_SRCS)
+
+CYCLES ?= 50
+run: run.vvp
+	$(VVP) run.vvp
+
+run.vvp: $(CPU_SRCS) tb/tb_run.sv
+	$(IVERILOG) $(FLAGS) -o run.vvp tb/tb_run.sv $(CPU_SRCS)
 
 clean:
 	rm -f *.vvp *.vcd
