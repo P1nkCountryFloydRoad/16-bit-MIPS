@@ -5,7 +5,7 @@ This is a single-cycle RISC processor inspired by MIPS, scaled to a 16-bit instr
 
 ## 2. Design Diagram
 ![Design Diagram](docs/16-bit_CPU.png)
-> **Figure 1:** CPU Architecture
+> **Figure 1:** CPU Architecture.
 
 ## 3. Timing Diagrams
 ![R-Type Timing Diagram](docs/R-Type_Timing.png)
@@ -22,3 +22,11 @@ This is a single-cycle RISC processor inspired by MIPS, scaled to a 16-bit instr
 > **Figure 4:** Demonstrates the immediate overwrite of the Program Counter with the 12-bit target address, bypassing the ALU and memory stages.
 
 ## 4. Instructions to Successfully Demo
+
+A video demo is provided below:
+![Video Demo](docs/Video_Demo.mp4)
+
+```
+make assemble_prog3
+make run
+```
